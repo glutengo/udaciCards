@@ -14,7 +14,6 @@ class DeckList extends Component {
 
     render() {
         const { decks } = this.props
-        console.log(decks)
         return (
     
             <View>
@@ -25,7 +24,6 @@ class DeckList extends Component {
                             deck={deck} 
                             onPress={() => this.navigateToDeck(deck)}/>))
                 }
-                <Text>Deck List</Text>
             </View>
         )
     }

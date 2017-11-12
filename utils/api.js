@@ -1,8 +1,6 @@
 const DECKS_STORAGE_KEY = 'UdaciCards:decks'
 import { AsyncStorage } from 'react-native'
 
-
-AsyncStorage.clear()
 export function getDecks() {
     return AsyncStorage.getItem(DECKS_STORAGE_KEY)
         .then(data => data ? JSON.parse(data) : {})
