@@ -61,8 +61,7 @@ class Quiz extends Component {
                         flipHorizontal={true}
                         flipVertical={false}
                         style={styles.cardContainer}
-                        alignWidth={true}
-                    >
+                        alignWidth={true}>
                         <View style={[styles.card, styles.container]}>
                             <Text style={styles.cardMeta}>Question</Text>
                             <View style={styles.container}>

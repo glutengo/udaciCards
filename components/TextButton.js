@@ -2,10 +2,11 @@ import React from 'react'
 import { Text, TouchableOpacity, StyleSheet } from 'react-native'
 
 export default function ({ onPress, text, disabled, buttonStyle, textStyle }) {
+    
     return (
         <TouchableOpacity
             disabled={disabled}
-            style={[styles.button, buttonStyle, { opacity: disabled ? 0.3 : 1}]}
+            style={[styles.button, buttonStyle, (disabled && { backgroundColor: 'rgba(0,0,0,0.3)'})]}
             onPress={() => onPress()}>
             <Text style={[styles.text, textStyle]}>{text}</Text>
         </TouchableOpacity>
