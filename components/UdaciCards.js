@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { Text, View, StatusBar, AppRegistry } from 'react-native'
-import { createStore, compose, applyMiddleware  } from 'redux'
+import { Text, View, StatusBar, AppRegistry, Alert } from 'react-native'
+import { createStore, compose, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
 import reducer from '../reducers'
@@ -11,37 +11,38 @@ import DeckDetails from './DeckDetails'
 import CreateQuestion from './CreateQuestion'
 import Quiz from './Quiz'
 import { connect } from 'react-redux'
-import { fetchDecks, fetchQuestions } from '../actions'
+import { fetchDecks, fetchQuestions, popError } from '../actions'
+import { FontAwesome } from '@expo/vector-icons'
+import { setLocalNotification } from '../utils/helpers'
 
 const Tabs = TabNavigator({
   DeckList: {
     screen: DeckList,
     navigationOptions: {
-      headerTitle: 'DeckList',
+      tabBarIcon: ({tintColor}) => <FontAwesome name='list' size={20} />
     }
   },
   CreateDeck: {
     screen: CreateDeck,
     navigationOptions: {
-      headerTitle: 'CreateDeck',
+      tabBarIcon: ({tintColor}) => <FontAwesome name='plus' size={20} />
     }
   }
-})
+}, {navigationOptions: {
+    headerTitle: 'UdaciCards'
+  }})
 
 const MainNavigator = StackNavigator({
   Home: {
     screen: Tabs
   },
   DeckDetails: {
-    screen: DeckDetails,
-    navigationOptions: {
-      headerTitle: 'DeckDetails',
-    }
+    screen: DeckDetails
   },
   CreateQuestion: {
     screen: CreateQuestion,
     navigationOptions: {
-      headerTitle: 'CreateQuestion',
+      headerTitle: 'Create Question',
     }
   },
   Quiz: {
@@ -56,23 +57,49 @@ class App extends Component {
 
   componentDidMount() {
     this.props.fetchDecks()
+    setLocalNotification()
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.errors.length) {
+      this.showError(nextProps.errors[nextProps.errors.length - 1])
+    }
+  }
+
+  showError(error) {
+    Alert.alert(
+      'Error',
+      error.message,
+      [
+        {text: 'OK', onPress: () => this.props.popError()},
+      ],
+      { cancelable: true }
+    )
   }
 
   render() {
     return (
-        <View style={{flex:1}}>
-          <StatusBar translucent backgroundColor={'rgba(255,0,0,1)'} barStyle={'light-content'}/>
-          <MainNavigator />
-        </View>
+      <View style={{ flex: 1 }}>
+        <StatusBar translucent backgroundColor={'rgba(255,0,0,1)'} />
+        <MainNavigator />
+      </View>
     )
   }
 }
 
-function mapDispatchToProps(dispatch, props) {
-    return {
-        ...props,
-        fetchDecks: () => dispatch(fetchDecks())
-    }
+function mapStateToProps({ errors }, props) {
+  return {
+    ...props,
+    errors
+  }
 }
 
-export default connect(null, mapDispatchToProps)(App)
+function mapDispatchToProps(dispatch, props) {
+  return {
+    ...props,
+    fetchDecks: () => dispatch(fetchDecks()),
+    popError: () => dispatch(popError())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)

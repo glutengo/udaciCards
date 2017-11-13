@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Text, View } from 'react-native'
+import { Text, View, ListView } from 'react-native'
 import DeckListItem from './DeckListItem'
 
 class DeckList extends Component {
@@ -12,27 +12,36 @@ class DeckList extends Component {
         )
     }
 
+    renderRow(deck, index) {
+        return (<DeckListItem
+            key={deck.title}
+            deck={deck}
+            onPress={() => this.navigateToDeck(deck)}
+        />)
+    }
+
     render() {
         const { decks } = this.props
-        return (
-    
-            <View>
-                {
-                    decks.map(deck => (
-                        <DeckListItem 
-                            key={deck.title} 
-                            deck={deck} 
-                            onPress={() => this.navigateToDeck(deck)}/>))
-                }
-            </View>
-        )
+
+        return decks ? (
+            <ListView
+                enableEmptySections={true}
+                scrollEnabled
+                dataSource={decks}
+                renderRow={(deck, index) => this.renderRow(deck, index)}
+            />
+        ) : null
     }
 }
 
-function mapStateToProps(decks, props) {
+function mapStateToProps({ decks }, props) {
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
+    const decksArray = Object.keys(decks)
+        .map(deckTitle => (decks[deckTitle]))
+
     return {
         ...props,
-        decks
+        decks: ds.cloneWithRows(decksArray)
     }
 }
 

@@ -1,9 +1,17 @@
 import React, { Component } from 'react'
-import { Text, View, TouchableOpacity, StyleSheet } from 'react-native'
+import { Text, View, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
+import TextButton from './TextButton'
 
 class DeckDetails extends Component {
 
+    static navigationOptions = ({ navigation }) => {
+        const { deckTitle } = navigation.state.params
+
+        return {
+            title: deckTitle
+        }
+    }
 
     navigateToCreateQuestion() {
         this.props.navigation.navigate(
@@ -24,16 +32,20 @@ class DeckDetails extends Component {
             <View style={styles.container}>
                 <Text style={styles.title}>{this.props.deck.title}</Text>
                 <Text style={styles.description}>{this.props.deck.questions.length} Cards</Text>
-                <TouchableOpacity 
-                    style={[styles.button, { borderColor: '#000', borderWidth: 1 }]}
-                    onPress={() => { this.navigateToCreateQuestion() }}>
-                    <Text style={{ textAlign: 'center' }}>Add Question</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.button, { backgroundColor: '#000'}]} 
-                    onPress={() => { this.navigateToQuiz() }}>
-                    <Text style={{ color: '#fff', textAlign: 'center' }}>Start Quiz</Text>
-                </TouchableOpacity>
+                <TextButton
+                    text='Add Question'
+                    onPress={() => { this.navigateToCreateQuestion() }} />
+                <TextButton
+                    disabled={this.props.deck.questions.length < 1}
+                    text='Start Quiz'
+                    onPress={() => { this.navigateToQuiz() }}
+                    buttonStyle={{ borderColor: '#000', backgroundColor: '#fff' }}
+                    textStyle={{ color: '#000' }} />
+                {this.props.deck.questions.length < 1 && (
+                    <Text style={{ textAlign: 'center' }}>
+                        You need to add questions before you can do the quiz
+                    </Text>
+                )}
             </View>
         )
     }
@@ -47,23 +59,17 @@ const styles = StyleSheet.create({
         padding: 50
     },
     title: {
-        fontSize: 40,
+        fontSize: 50,
         margin: 10
     },
     description: {
         fontSize: 30,
-        color: 'rgba(0,0,0,0.5)',
-        marginBottom: 50
-    },
-    button: {
-        padding: 10,
-        margin: 10,
-        borderRadius: 5,
-        width: '100%'
+        color: 'rgb(100,100,100)',
+        margin: 20
     }
 })
 
-function mapStateToProps(decks, props) {
+function mapStateToProps({ decks }, props) {
     const deckTitle = props.navigation.state.params.deckTitle
     return {
         ...props,

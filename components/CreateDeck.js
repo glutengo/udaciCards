@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Text, View, KeyboardAvoidingView, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
-import { createDeck } from '../actions'
+import { Text, View, KeyboardAvoidingView, TextInput, StyleSheet } from 'react-native'
+import { createDeck, PUSH_ERROR } from '../actions'
+import TextButton from './TextButton'
 
 class CreateDeck extends React.Component {
 
@@ -11,8 +12,13 @@ class CreateDeck extends React.Component {
 
     createDeck() {
         this.props.createDeck(this.state.title)
-        this.setState({ title: '' })
-        this.props.navigation.navigate('DeckList');
+            .then(action => {
+                if (action.type !== PUSH_ERROR) {
+                    this.props.navigation.navigate('DeckList');
+                    this.props.navigation.navigate('DeckDetails', {deckTitle: this.state.title})
+                    this.setState({ title: '' })
+                }
+            })
     }
 
     render() {
@@ -24,12 +30,10 @@ class CreateDeck extends React.Component {
                     value={this.state.title}
                     onChangeText={title => this.setState({ title })}
                 />
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => this.createDeck()}
-                    disabled={this.state.title.length < 1}>
-                    <Text style={styles.buttonText}>Submit</Text>
-                </TouchableOpacity>
+                <TextButton 
+                    disabled={this.state.title.length < 1}
+                    text='Submit'
+                    onPress={() => this.createDeck()}/>
             </KeyboardAvoidingView>
         )
     }
@@ -57,16 +61,9 @@ const styles = StyleSheet.create({
         margin: 20,
         padding: 10,
         width: '100%',
-        borderColor: '#000000',
-        borderWidth: 1
-    },
-    button: {
-        backgroundColor: '#000',
-        padding: 10,
-        borderRadius: 5 
-    },
-    buttonText: {
-        color: '#fff'
+        borderColor: '#000',
+        borderWidth: 1,
+        borderRadius: 5
     }
 })
 
